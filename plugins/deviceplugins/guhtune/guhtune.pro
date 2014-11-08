@@ -10,5 +10,6 @@ SOURCES += \
 HEADERS += \
     devicepluginguhtune.h
 
-RESOURCES += qml.qrc
+RESOURCES += qml.qrc \
+            images.qrc
 

@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
-     <file>guhtune-ui/main.qml</file>
+     <file>images/logo.png</file>
  </qresource>
  </RCC>
