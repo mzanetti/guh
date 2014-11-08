@@ -10,7 +10,7 @@ INCLUDEPATH += ../libguh jsonrpc
 target.path = /usr/bin
 INSTALLS += target
 
-QT += network
+QT += network declarative
 
 LIBS += -L$$top_builddir/libguh/ -lguh
 

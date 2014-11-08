@@ -13,6 +13,7 @@ SUBDIRS += elro         \
     eq-3                \
     wemo                \
     lgsmarttv           \
+    guhtune             \
 
 boblight {
     SUBDIRS += boblight

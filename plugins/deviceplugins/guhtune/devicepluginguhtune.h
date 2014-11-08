@@ -16,26 +16,29 @@
  *                                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include <QCoreApplication>
-#include <QApplication>
-#include <guhcore.h>
+#ifndef DEVICEPLUGINELRO_H
+#define DEVICEPLUGINELRO_H
 
-#include <QtPlugin>
+#include "plugin/deviceplugin.h"
 
-int main(int argc, char *argv[])
+class DevicePluginGuhTune : public DevicePlugin
 {
-    QCoreApplication *a;
-    // FIXME: move back to core application once we have a separated UI for guhTune
-    if (!qgetenv("DISPLAY").isEmpty()) {
-        a = new QApplication(argc,argv);
-    }else{
-        qDebug() << "no display found";
-        a = new QCoreApplication(argc,argv);
-    }
+    Q_OBJECT
 
-    a->setOrganizationName("guh");
+    Q_PLUGIN_METADATA(IID "guru.guh.DevicePlugin" FILE "devicepluginguhtune.json")
+    Q_INTERFACES(DevicePlugin)
 
-    GuhCore::instance();
+public:
+    explicit DevicePluginGuhTune();
 
-    return a->exec();
-}
+    DeviceManager::HardwareResources requiredHardware() const override;
+    void startMonitoringAutoDevices() override;
+    DeviceManager::DeviceSetupStatus setupDevice(Device *device) override;
+
+
+public slots:
+    DeviceManager::DeviceError executeAction(Device *device, const Action &action) override;
+
+};
+
+#endif // DEVICEPLUGINELRO_H

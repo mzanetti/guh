@@ -1,0 +1,26 @@
+{
+    "name": "guhTune",
+    "id": "f61ab425-773d-4c7b-8e41-6477700c8d1e",
+    "vendors": [
+        {
+            "name": "guh",
+            "id": "2062d64d-3232-433c-88bc-0d33c0ba2ba6",
+            "deviceClasses": [
+                {
+                    "deviceClassId": "4a20b247-576c-4a0f-bc95-9eb6b2f2eb3d",
+                    "name": "guhTune",
+                    "createMethods": ["auto"],
+                    "paramTypes": [
+
+                    ],
+                    "stateTypes": [
+
+                    ],
+                    "actionTypes": [
+
+                    ]
+                }
+            ]
+        }
+    ]
+}
