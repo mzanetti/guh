@@ -14,6 +14,7 @@ SUBDIRS += elro         \
     wemo                \
     lgsmarttv           \
     guhtune             \
+    genericelements     \
 
 boblight {
     SUBDIRS += boblight
