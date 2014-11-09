@@ -50,6 +50,7 @@ void DevicePluginGuhTune::startMonitoringAutoDevices()
 
     QDeclarativeView *viewer = new QDeclarativeView();
     viewer->engine()->addImportPath(QLatin1String("modules"));
+    viewer->engine()->rootContext()->setContextProperty("controller", this);
     viewer->setSource(QUrl(QLatin1String("qrc:///guhtune-ui/main.qml")));
     viewer->show();
 }
@@ -72,4 +73,10 @@ DeviceManager::DeviceError DevicePluginGuhTune::executeAction(Device *device, co
     Q_UNUSED(action);
 
     return DeviceManager::DeviceErrorNoError;
+}
+
+void DevicePluginGuhTune::invokeAction(int actionIndex, const QString &what)
+{
+    qDebug() << "button pressed" << actionIndex << what;
+    // emit event here!
 }

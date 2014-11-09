@@ -36,6 +36,8 @@ public:
     DeviceManager::DeviceSetupStatus setupDevice(Device *device) override;
 
 
+    Q_INVOKABLE void invokeAction(int actionIndex, const QString &what);
+
 public slots:
     DeviceManager::DeviceError executeAction(Device *device, const Action &action) override;
 
