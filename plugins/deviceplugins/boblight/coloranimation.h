@@ -16,44 +16,43 @@
  *                                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef DEVICEPLUGINBOBLIGHT_H
-#define DEVICEPLUGINBOBLIGHT_H
+#ifndef COLORANIMATION_H
+#define COLORANIMATION_H
 
-#include "plugin/deviceplugin.h"
+#include <QObject>
+#include <QColor>
+#include <QTimer>
 
-#include <QProcess>
-#include "coloranimation.h"
+#include "plugin/device.h"
 
-class BobClient;
-
-class DevicePluginBoblight : public DevicePlugin
+class ColorAnimation : public QObject
 {
     Q_OBJECT
-
-    Q_PLUGIN_METADATA(IID "guru.guh.DevicePlugin" FILE "devicepluginboblight.json")
-    Q_INTERFACES(DevicePlugin)
-
 public:
-    explicit DevicePluginBoblight();
+    explicit ColorAnimation(ActionId actionId = ActionId(), int channel = -1, QColor startColor = QColor(0,0,0), QColor endColor = QColor(255,255,255), int duration = 1000);
+    void startAnimation();
 
-    DeviceManager::HardwareResources requiredHardware() const override;
-
-    void startMonitoringAutoDevices() override;
-    DeviceManager::DeviceSetupStatus setupDevice(Device *device) override;
-
-    QList<ParamType> configurationDescription() const override;
-
-public slots:
-    DeviceManager::DeviceError executeAction(Device *device, const Action &action);
-
-private slots:
-    void connectToBoblight();
-    void updateColor(const int &channel, const QColor &newColor);
-    void animationFinished(ActionId actionId);
+    int channel();
+    QColor startColor();
+    QColor endColor();
+    int duration();
 
 private:
-    BobClient *m_bobClient;
-    QHash<ColorAnimation*, Device*> m_runningAnimations;
+    ActionId m_actionId;
+    int m_channel;
+    QColor m_startColor;
+    QColor m_endColor;
+    int m_duration;
+
+    QColor m_currentColor;
+    QTimer *m_animationTimer;
+
+signals:
+    void updateColor(const int &channel, const QColor &color);
+    void animationFinished(ActionId actionId);
+
+private slots:
+    void animate();
 };
 
-#endif // DEVICEPLUGINBOBLIGHT_H
+#endif // COLORANIMATION_H

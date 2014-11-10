@@ -28,7 +28,10 @@
 
 DeviceClassId boblightDeviceClassId = DeviceClassId("1647c61c-db14-461e-8060-8a3533d5d92f");
 StateTypeId colorStateTypeId = StateTypeId("97ec80cd-43a9-40fa-93b7-d1580043d981");
+StateTypeId brightnessStateTypeId = StateTypeId("f22a273b-cc27-4acf-b087-18d59380569f");
 ActionTypeId setColorActionTypeId = ActionTypeId("668e1aa3-fa13-49ce-8630-17a5c0a7c34b");
+ActionTypeId setPowerActionTypeId = ActionTypeId("5c4a0e04-c978-4666-8470-13ccba9436a1");
+ActionTypeId setBrightnessActionTypeId = ActionTypeId("b8ee03a3-c63a-4a03-ad96-b549757fd1d7");
 
 DevicePluginBoblight::DevicePluginBoblight()
 {
@@ -51,7 +54,7 @@ void DevicePluginBoblight::startMonitoringAutoDevices()
 
     QList<DeviceDescriptor> deviceDescriptorList;
     for (int i = loadedDevices.count(); i < m_bobClient->lightsCount(); i++) {
-        DeviceDescriptor deviceDescriptor(boblightDeviceClassId, "Boblight Channel " + QString::number(i));
+        DeviceDescriptor deviceDescriptor(boblightDeviceClassId, "Boblight (Channel " + QString::number(i) + ")");
         ParamList params;
         Param param("channel");
         param.setValue(i);
@@ -62,24 +65,15 @@ void DevicePluginBoblight::startMonitoringAutoDevices()
     emit autoDevicesAppeared(boblightDeviceClassId, deviceDescriptorList);
 }
 
-QPair<DeviceManager::DeviceSetupStatus, QString> DevicePluginBoblight::setupDevice(Device *device)
+DeviceManager::DeviceSetupStatus DevicePluginBoblight::setupDevice(Device *device)
 {
     if (!m_bobClient->connected()) {
-        return reportDeviceSetup(DeviceManager::DeviceSetupStatusFailure, "Cannot connect to Boblight");
+        return DeviceManager::DeviceSetupStatusFailure;
     }
 
+    device->setName("Boblight (Channel " + device->paramValue("channel").toString() + ")");
     m_bobClient->currentColor(device->paramValue("channel").toInt());
-    return reportDeviceSetup();
-}
-
-QString DevicePluginBoblight::pluginName() const
-{
-    return "Boblight client";
-}
-
-PluginId DevicePluginBoblight::pluginId() const
-{
-    return boblightPluginUuid;
+    return DeviceManager::DeviceSetupStatusSuccess;
 }
 
 QList<ParamType> DevicePluginBoblight::configurationDescription() const
@@ -90,21 +84,78 @@ QList<ParamType> DevicePluginBoblight::configurationDescription() const
     return params;
 }
 
-QPair<DeviceManager::DeviceError, QString> DevicePluginBoblight::executeAction(Device *device, const Action &action)
+DeviceManager::DeviceError DevicePluginBoblight::executeAction(Device *device, const Action &action)
 {
     if (!m_bobClient->connected()) {
-        return report(DeviceManager::DeviceErrorSetupFailed, device->id().toString());
+        return DeviceManager::DeviceErrorHardwareNotAvailable;
     }
-    QColor newColor = action.param("color").value().value<QColor>();
-    if (!newColor.isValid()) {
-        return report(DeviceManager::DeviceErrorActionParameterError, "color");
-    }
-    qDebug() << "executing boblight action" << newColor;
-    m_bobClient->setColor(device->paramValue("channel").toInt(), newColor);
-    m_bobClient->sync();
+    if (device->deviceClassId() == boblightDeviceClassId) {
+        if(action.actionTypeId() == setColorActionTypeId) {
+            QColor newColor = action.param("color").value().value<QColor>();
+            qDebug() << "set to new color" << newColor;
+            if (!newColor.isValid()) {
+                return DeviceManager::DeviceErrorInvalidParameter;
+            }
 
-    device->setStateValue(colorStateTypeId, newColor);
-    return report();
+            if (action.params().paramValue("animation duration").toInt() == 0) {
+                m_bobClient->setColor(device->paramValue("channel").toInt(), newColor);
+                m_bobClient->sync();
+                return DeviceManager::DeviceErrorNoError;
+            }
+
+            ColorAnimation *colorAnimation = new ColorAnimation(action.id(),
+                                                                device->paramValue("channel").toInt(),
+                                                                device->stateValue(colorStateTypeId).value<QColor>(),
+                                                                newColor,
+                                                                action.params().paramValue("animation duration").toInt());
+
+            connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
+            connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
+
+            m_runningAnimations.insert(colorAnimation, device);
+
+            colorAnimation->startAnimation();
+            return DeviceManager::DeviceErrorAsync;
+        }
+        if (action.actionTypeId() == setPowerActionTypeId) {
+            if (action.params().paramValue("power").toBool()) {
+                ColorAnimation *colorAnimation = new ColorAnimation(action.id(),
+                                                                    device->paramValue("channel").toInt(),
+                                                                    device->stateValue(colorStateTypeId).value<QColor>(),
+                                                                    QColor(255,255,255),
+                                                                    500);
+
+                connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
+                connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
+
+                m_runningAnimations.insert(colorAnimation, device);
+
+                colorAnimation->startAnimation();
+                return DeviceManager::DeviceErrorAsync;
+            } else {
+                ColorAnimation *colorAnimation = new ColorAnimation(action.id(),
+                                                                    device->paramValue("channel").toInt(),
+                                                                    device->stateValue(colorStateTypeId).value<QColor>(),
+                                                                    QColor(0,0,0),
+                                                                    500);
+
+                connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
+                connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
+
+                m_runningAnimations.insert(colorAnimation, device);
+
+                colorAnimation->startAnimation();
+                return DeviceManager::DeviceErrorAsync;            }
+            m_bobClient->sync();
+        }
+        if (action.actionTypeId() == setBrightnessActionTypeId) {
+            m_bobClient->setBrightness(device->paramValue("channel").toInt(), action.params().paramValue("brightness").toInt());
+            m_bobClient->sync();
+        }
+        return DeviceManager::DeviceErrorActionTypeNotFound;
+    }
+    return DeviceManager::DeviceErrorDeviceClassNotFound;
+
 }
 
 void DevicePluginBoblight::connectToBoblight()
@@ -113,3 +164,21 @@ void DevicePluginBoblight::connectToBoblight()
         m_bobClient->connect(configValue("boblighthost").toString(), configValue("boblightport").toInt());
     }
 }
+
+void DevicePluginBoblight::updateColor(const int &channel, const QColor &newColor)
+{
+    qDebug() << "update color " << newColor;
+    m_bobClient->setColor(channel, newColor);
+    m_bobClient->sync();
+}
+
+void DevicePluginBoblight::animationFinished(ActionId actionId)
+{
+    ColorAnimation *colorAnimation = static_cast<ColorAnimation*>(sender());
+    Device* device = m_runningAnimations.take(colorAnimation);
+    device->setStateValue(colorStateTypeId, colorAnimation->endColor());
+    emit actionExecutionFinished(actionId, DeviceManager::DeviceErrorNoError);
+    colorAnimation->deleteLater();
+}
+
+

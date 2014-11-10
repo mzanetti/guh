@@ -42,6 +42,7 @@ signals:
     
 public slots:
     void setColor(int channel, QColor color);
+    void setBrightness(int channel, int brightness);
     void sync();
 
 private:
@@ -53,6 +54,13 @@ private:
 
     QTime m_lastSyncTime;
     QTimer m_resyncTimer;
+
+    QMap<int, QPair<QColor, QColor> > m_colorAnimations;
+    QTimer m_animationTimer;
+
+private slots:
+    void animate(int channel, QColor startColor, QColor endColor);
+
 };
 
 #endif // BOBCLIENT_H

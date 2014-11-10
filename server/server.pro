@@ -17,11 +17,3 @@ LIBS += -L$$top_builddir/libguh/ -lguh
 include(server.pri)
 SOURCES += main.cpp
 
-boblight {
-    xcompile {
-        LIBS += -L../plugins/deviceplugins/boblight -lguh_devicepluginboblight -lboblight
-    } else {
-        LIBS += -L../plugins/deviceplugins/boblight -lguh_devicepluginboblight -L/usr/local/lib/ -lboblight
-    }
-    DEFINES += USE_BOBLIGHT
-}

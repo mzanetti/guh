@@ -75,7 +75,22 @@ void BobClient::setColor(int channel, QColor color)
         }
     } else {
         m_colors[channel] = color;
-//        qDebug() << "set channel" << channel << "to color" << color;
+        //        qDebug() << "set channel" << channel << "to color" << color;
+    }
+}
+
+void BobClient::setBrightness(int channel, int brightness)
+{
+    if (channel == -1) {
+        for (int i = 0; i < lightsCount(); ++i) {
+            QColor newColor = m_colors[i];
+            newColor.setAlpha(brightness);
+            setColor(i, newColor);
+        }
+    }else{
+        QColor newColor = m_colors[channel];
+        newColor.setAlpha(brightness);
+        setColor(channel, newColor);
     }
 }
 
@@ -100,11 +115,10 @@ void BobClient::sync()
         rgb[0] = m_colors[i].red() * m_colors[i].alphaF();
         rgb[1] = m_colors[i].green() * m_colors[i].alphaF();
         rgb[2] = m_colors[i].blue() * m_colors[i].alphaF();
-//        qDebug() << "set color" << rgb[0] << rgb[1] << rgb[2];
+        //        qDebug() << "set color" << rgb[0] << rgb[1] << rgb[2];
 
         //set all lights to the color we want and send it
         boblight_addpixel(m_boblight, i, rgb);
-
     }
 
     if (!boblight_sendrgb(m_boblight, 1, NULL)) //some error happened, probably connection broken, so bitch and try again

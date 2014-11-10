@@ -16,7 +16,14 @@
                             "name": "color",
                             "type": "QColor",
                             "defaultValue": "#000000"
+                        },
+                        {
+                            "id": "f22a273b-cc27-4acf-b087-18d59380569f",
+                            "name": "brightness",
+                            "type": "int",
+                            "defaultValue": "255"
                         }
+
                     ],
                     "actionTypes": [
                         {
@@ -26,6 +33,33 @@
                                 {
                                     "name": "color",
                                     "type": "QColor"
+                                },
+                                {
+                                    "name": "animation duration",
+                                    "type": "uint",
+                                    "defaultValue": "1000"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "5c4a0e04-c978-4666-8470-13ccba9436a1",
+                            "name": "Set power",
+                            "paramTypes": [
+                                {
+                                    "name": "power",
+                                    "type": "bool"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "b8ee03a3-c63a-4a03-ad96-b549757fd1d7",
+                            "name": "Set brightness",
+                            "paramTypes": [
+                                {
+                                    "name": "brightness",
+                                    "type": "int",
+                                    "minimumValue": "0",
+                                    "maximumValue": "255"
                                 }
                             ]
                         }
