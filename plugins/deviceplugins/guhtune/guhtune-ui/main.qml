@@ -2,8 +2,8 @@ import QtQuick 1.1
 
 Rectangle {
     id: root
-    width: 400    //240x320  128x160
-    height: 600
+    width: 128   //240x320  128x160
+    height: 160
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()

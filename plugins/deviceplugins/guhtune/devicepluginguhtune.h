@@ -20,6 +20,10 @@
 #define DEVICEPLUGINELRO_H
 
 #include "plugin/deviceplugin.h"
+#include "guhbutton.h"
+
+#include <QDebug>
+#include <QTimer>
 
 class DevicePluginGuhTune : public DevicePlugin
 {
@@ -35,8 +39,16 @@ public:
     void startMonitoringAutoDevices() override;
     DeviceManager::DeviceSetupStatus setupDevice(Device *device) override;
 
-
     Q_INVOKABLE void invokeAction(int actionIndex, const QString &what);
+
+private:
+    GuhButton *m_button;
+    QTimer *m_timer;
+
+private slots:
+    void buttonPressed();
+    void buttonLongPressed();
+    void buttonReleased();
 
 public slots:
     DeviceManager::DeviceError executeAction(Device *device, const Action &action) override;

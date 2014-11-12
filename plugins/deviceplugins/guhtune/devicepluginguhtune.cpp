@@ -31,7 +31,6 @@ DeviceClassId guhTuneDeviceClassId = DeviceClassId("4a20b247-576c-4a0f-bc95-9eb6
 
 DevicePluginGuhTune::DevicePluginGuhTune()
 {
-
 }
 
 void DevicePluginGuhTune::startMonitoringAutoDevices()
@@ -48,6 +47,21 @@ void DevicePluginGuhTune::startMonitoringAutoDevices()
         return;
     }
 
+    // Hardware pushbutton
+    m_button = new GuhButton(this, 18);
+    if(m_button->isAvailable()){
+        m_button->enable();
+        connect(m_button, &GuhButton::pressed, this, &DevicePluginGuhTune::buttonPressed);
+        connect(m_button, &GuhButton::released, this, &DevicePluginGuhTune::buttonReleased);
+    }
+
+    // timer for long pressed detection
+    m_timer = new QTimer(this);
+    m_timer->setInterval(500);
+    m_timer->setSingleShot(true);
+    connect(m_timer, &QTimer::timeout, this, &DevicePluginGuhTune::buttonLongPressed);
+
+    // QML viewer
     QDeclarativeView *viewer = new QDeclarativeView();
     viewer->engine()->addImportPath(QLatin1String("modules"));
     viewer->engine()->rootContext()->setContextProperty("controller", this);
@@ -79,4 +93,21 @@ void DevicePluginGuhTune::invokeAction(int actionIndex, const QString &what)
 {
     qDebug() << "button pressed" << actionIndex << what;
     // emit event here!
+}
+
+void DevicePluginGuhTune::buttonPressed()
+{
+    qDebug() << "button pressed";
+    m_timer->start();
+}
+
+void DevicePluginGuhTune::buttonLongPressed()
+{
+    qDebug() << "button long pressed";
+}
+
+void DevicePluginGuhTune::buttonReleased()
+{
+    qDebug() << "button released";
+    m_timer->stop();
 }
