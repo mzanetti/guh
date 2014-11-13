@@ -40,6 +40,7 @@ WemoDiscovery::WemoDiscovery(QObject *parent) :
 
     connect(this,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(error(QAbstractSocket::SocketError)));
     connect(this,SIGNAL(readyRead()),this,SLOT(readData()));
+    qDebug() << "-------> Wemo discovery successfuly created";
 }
 
 bool WemoDiscovery::checkXmlData(QByteArray data)
@@ -93,8 +94,8 @@ void WemoDiscovery::sendDiscoverMessage()
 {
     QByteArray ssdpSearchMessage("M-SEARCH * HTTP/1.1\r\n"
                                  "HOST:239.255.255.250:1900\r\n"
-                                 "ST:upnp:rootdevice\r\n"
-                                 "MX:2\r\n"
+                                 "ST:urn:Belkin:service:basicevent:1\r\n"
+                                 "MX:1\r\n"
                                  "MAN:\"ssdp:discover\"\r\n\r\n");
     writeDatagram(ssdpSearchMessage,m_host,m_port);
 }
@@ -113,6 +114,8 @@ void WemoDiscovery::readData()
 
     if(data.contains("HTTP/1.1 200 OK")){
         const QStringList lines = QString(data).split("\r\n");
+
+        qDebug() << data;
 
         QUrl location;
         QString uuid;

@@ -22,7 +22,7 @@ ColorAnimation::ColorAnimation(ActionId actionId, int channel, QColor startColor
     m_actionId(actionId), m_channel(channel), m_startColor(startColor), m_endColor(endColor), m_duration(duration)
 {
     m_animationTimer = new QTimer(this);
-    m_animationTimer->setInterval(30);
+    m_animationTimer->setInterval(50);
 
     m_currentColor = m_startColor;
 
@@ -60,35 +60,43 @@ void ColorAnimation::animate()
     int steps = m_duration / m_animationTimer->interval();
 
     // RED
-    int stepSize = (m_endColor.red() - m_startColor.red()) / steps;
-    if (stepSize > 0) {
-        newColor.setRed(qMin(m_currentColor.red() + stepSize, m_endColor.red()));
+    int stepSizeRed = (m_endColor.red() - m_startColor.red()) / steps;
+    if (stepSizeRed > 0) {
+        newColor.setRed(qMin(m_currentColor.red() + stepSizeRed, m_endColor.red()));
     } else {
-        newColor.setRed(qMax(m_currentColor.red() + stepSize, m_endColor.red()));
+        newColor.setRed(qMax(m_currentColor.red() + stepSizeRed, m_endColor.red()));
     }
 
     // GREEN
-    stepSize = (m_endColor.green() - m_startColor.green()) / steps;
-    if (stepSize > 0) {
-        newColor.setGreen(qMin(m_currentColor.green() + stepSize, m_endColor.green()));
+    int stepSizeGreen = (m_endColor.green() - m_startColor.green()) / steps;
+    if (stepSizeGreen > 0) {
+        newColor.setGreen(qMin(m_currentColor.green() + stepSizeGreen, m_endColor.green()));
     } else {
-        newColor.setGreen(qMax(m_currentColor.green() + stepSize, m_endColor.green()));
+        newColor.setGreen(qMax(m_currentColor.green() + stepSizeGreen, m_endColor.green()));
     }
 
     // BLUE
-    stepSize = (m_endColor.blue() - m_startColor.blue()) / steps;
-    if (stepSize > 0) {
-        newColor.setBlue(qMin(m_currentColor.blue() + stepSize, m_endColor.blue()));
+    int stepSizeBlue = (m_endColor.blue() - m_startColor.blue()) / steps;
+    if (stepSizeBlue > 0) {
+        newColor.setBlue(qMin(m_currentColor.blue() + stepSizeBlue, m_endColor.blue()));
     } else {
-        newColor.setBlue(qMax(m_currentColor.blue() + stepSize, m_endColor.blue()));
+        newColor.setBlue(qMax(m_currentColor.blue() + stepSizeBlue, m_endColor.blue()));
     }
 
     // ALPHA
-    stepSize = (m_endColor.alpha() - m_startColor.alpha()) / steps;
-    if (stepSize > 0) {
-        newColor.setAlpha(qMin(m_currentColor.alpha() + stepSize, m_endColor.alpha()));
+    int stepSizeAlpha = (m_endColor.alpha() - m_startColor.alpha()) / steps;
+    if (stepSizeAlpha > 0) {
+        newColor.setAlpha(qMin(m_currentColor.alpha() + stepSizeAlpha, m_endColor.alpha()));
     } else {
-        newColor.setAlpha(qMax(m_currentColor.alpha() + stepSize, m_endColor.alpha()));
+        newColor.setAlpha(qMax(m_currentColor.alpha() + stepSizeAlpha, m_endColor.alpha()));
+    }
+
+    qDebug() << "update color" << m_currentColor << "  ---->  " << newColor;;
+
+    // all steps are to small (prevent endless loop)
+    if(stepSizeRed == 0 && stepSizeGreen == 0 && stepSizeBlue == 0 && stepSizeAlpha == 0){
+        qDebug() << "steps to small for animation --> set color directly to endcolor " << endColor();
+        newColor = m_endColor;
     }
 
     m_currentColor = newColor;

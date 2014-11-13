@@ -200,7 +200,7 @@ void JsonReply::setCommandId(int commandId)
 
 void JsonReply::startWait()
 {
-    m_timeout.start(5000);
+    m_timeout.start(10000);
 }
 
 void JsonReply::timeout()

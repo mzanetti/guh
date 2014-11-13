@@ -190,7 +190,7 @@ void DevicePluginBoblight::connectToBoblight()
 
 void DevicePluginBoblight::updateColor(const int &channel, const QColor &newColor)
 {
-    qDebug() << "update color " << newColor;
+    //qDebug() << "update color " << newColor;
     m_bobClient->setColor(channel, newColor);
     m_bobClient->sync();
 }
