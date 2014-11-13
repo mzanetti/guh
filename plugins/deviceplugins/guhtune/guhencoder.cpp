@@ -16,44 +16,50 @@
  *                                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef GUHBUTTON_H
-#define GUHBUTTON_H
+#include "guhencoder.h"
 
-#include <QObject>
-#include <QThread>
-#include <QDebug>
-
-#include "hardware/gpio.h"
-
-class GuhButton : public QThread
+GuhEncoder::GuhEncoder(QObject *parent, int gpioA, int gpioB) :
+    QThread(parent), m_gpioA(gpioA), m_gpioB(gpioB)
 {
-    Q_OBJECT
-public:
-    explicit GuhButton(QObject *parent = 0, int gpio = 4);
 
-    bool enable();
-    bool disable();
-    bool isAvailable();
-    bool isPressed();
+}
 
-private:
-    int m_gpioPin;
-    Gpio *m_gpio;
+bool GuhEncoder::enable()
+{
+    m_mutex.lock();
+    m_enabled = true;
+    m_mutex.unlock();
 
-    QMutex m_mutex;
-    QMutex m_isPressedMutex;
-    bool m_enabled;
+    start();
+    return true;
+}
 
-    bool m_isPressed;
-    bool setUpGpio();
+bool GuhEncoder::disable()
+{
+    m_mutex.lock();
+    m_enabled = false;
+    m_mutex.unlock();
+    return true;
+}
 
-protected:
-    void run() override;
+bool GuhEncoder::isAvailable()
+{
+    return setUpGpio();
+}
 
-signals:
-    void pressed();
-    void released();
+bool GuhEncoder::setUpGpio()
+{
+    qDebug() << "setup encoder GPIO";
 
-};
+//    m_gpio = new Gpio(this, m_gpioPin);
 
-#endif // GUHBUTTON_H
+//    if (!m_gpio->exportGpio() || !m_gpio->setDirection(INPUT) || !m_gpio->setEdgeInterrupt(EDGE_BOTH)) {
+//        return false;
+//    }
+    return true;
+}
+
+void GuhEncoder::run()
+{
+
+}

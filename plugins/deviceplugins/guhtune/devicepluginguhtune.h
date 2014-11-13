@@ -50,9 +50,6 @@ private slots:
     void buttonLongPressed();
     void buttonReleased();
 
-public slots:
-    DeviceManager::DeviceError executeAction(Device *device, const Action &action) override;
-
 };
 
 #endif // DEVICEPLUGINELRO_H

@@ -10,6 +10,12 @@
                     "deviceClassId": "1647c61c-db14-461e-8060-8a3533d5d92f",
                     "name": "Boblight",
                     "createMethods": ["auto"],
+                    "paramTypes": [
+                        {
+                            "name": "channel",
+                            "type": "int"
+                        }
+                    ],
                     "stateTypes": [
                         {
                             "id": "97ec80cd-43a9-40fa-93b7-d1580043d981",

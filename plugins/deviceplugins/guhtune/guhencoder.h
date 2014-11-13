@@ -16,8 +16,8 @@
  *                                                                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef GUHBUTTON_H
-#define GUHBUTTON_H
+#ifndef GUHENCODER_H
+#define GUHENCODER_H
 
 #include <QObject>
 #include <QThread>
@@ -25,35 +25,35 @@
 
 #include "hardware/gpio.h"
 
-class GuhButton : public QThread
+class GuhEncoder : public QThread
 {
     Q_OBJECT
 public:
-    explicit GuhButton(QObject *parent = 0, int gpio = 4);
-
+    explicit GuhEncoder(QObject *parent = 0, int gpioA = 2, int gpioB = 3);
     bool enable();
     bool disable();
     bool isAvailable();
-    bool isPressed();
 
 private:
-    int m_gpioPin;
-    Gpio *m_gpio;
+    int m_gpioA;
+    int m_gpioB;
 
     QMutex m_mutex;
     QMutex m_isPressedMutex;
-    bool m_enabled;
 
+    bool m_enabled;
     bool m_isPressed;
+
     bool setUpGpio();
 
 protected:
     void run() override;
 
 signals:
+    void clockwiseTick();
+    void counterClockwiseTick();
     void pressed();
     void released();
-
 };
 
-#endif // GUHBUTTON_H
+#endif // GUHENCODER_H

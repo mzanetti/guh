@@ -2,8 +2,8 @@ import QtQuick 1.1
 
 Rectangle {
     id: root
-    width: 128   //240x320  128x160
-    height: 160
+    width: 480   //240x320  128x160
+    height: 640
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()
@@ -11,8 +11,15 @@ Rectangle {
     property int currentItem: 0
     property bool buttonPressed: false
 
-    Keys.onSpacePressed: root.buttonPressed = true;
-    Keys.onReleased: if (event.key == Qt.Key_Space) root.buttonPressed = false;
+    Keys.onSpacePressed: {
+        longPressedTimer.start()
+        controller.invokeAction(root.currentItem, "pressed")
+        root.buttonPressed = true;
+    }
+    Keys.onReleased: {
+        if (event.key == Qt.Key_Space) root.buttonPressed = false;
+        //controller.invokeAction(root.currentItem, "released");
+    }
     Keys.onLeftPressed: {
         if (buttonPressed) {
             var newValue = root.currentItem - 1;
@@ -31,7 +38,7 @@ Rectangle {
             controller.invokeAction(root.currentItem, "increase")
         }
     }
-    Keys.onPressed: {
+    Keys.onTabPressed: {
         splashTimer.start()
     }
 
@@ -57,6 +64,13 @@ Rectangle {
         interval: 2000
         repeat: false
         running: true
+    }
+
+    Timer {
+        id: longPressedTimer
+        interval: 500
+        repeat: false
+        running: false
     }
 
     Image {
