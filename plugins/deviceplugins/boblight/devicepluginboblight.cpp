@@ -89,6 +89,7 @@ DeviceManager::DeviceError DevicePluginBoblight::executeAction(Device *device, c
     if (!m_bobClient->connected()) {
         return DeviceManager::DeviceErrorHardwareNotAvailable;
     }
+    // COLOR
     if (device->deviceClassId() == boblightDeviceClassId) {
         if(action.actionTypeId() == setColorActionTypeId) {
             QColor newColor = action.param("color").value().value<QColor>();
@@ -117,13 +118,14 @@ DeviceManager::DeviceError DevicePluginBoblight::executeAction(Device *device, c
             colorAnimation->startAnimation();
             return DeviceManager::DeviceErrorAsync;
         }
+        // POWER
         if (action.actionTypeId() == setPowerActionTypeId) {
             if (action.params().paramValue("power").toBool()) {
                 ColorAnimation *colorAnimation = new ColorAnimation(action.id(),
                                                                     device->paramValue("channel").toInt(),
                                                                     device->stateValue(colorStateTypeId).value<QColor>(),
                                                                     QColor(255,255,255),
-                                                                    500);
+                                                                    2000);
 
                 connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
                 connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
@@ -137,7 +139,7 @@ DeviceManager::DeviceError DevicePluginBoblight::executeAction(Device *device, c
                                                                     device->paramValue("channel").toInt(),
                                                                     device->stateValue(colorStateTypeId).value<QColor>(),
                                                                     QColor(0,0,0),
-                                                                    500);
+                                                                    2000);
 
                 connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
                 connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
@@ -145,12 +147,33 @@ DeviceManager::DeviceError DevicePluginBoblight::executeAction(Device *device, c
                 m_runningAnimations.insert(colorAnimation, device);
 
                 colorAnimation->startAnimation();
-                return DeviceManager::DeviceErrorAsync;            }
+                return DeviceManager::DeviceErrorAsync;
+            }
             m_bobClient->sync();
         }
+        // BRIGHTNESS
         if (action.actionTypeId() == setBrightnessActionTypeId) {
-            m_bobClient->setBrightness(device->paramValue("channel").toInt(), action.params().paramValue("brightness").toInt());
-            m_bobClient->sync();
+            if (action.params().paramValue("animation duration").toInt() == 0) {
+                m_bobClient->setBrightness(device->paramValue("channel").toInt(), action.params().paramValue("brightness").toInt());
+                m_bobClient->sync();
+                return DeviceManager::DeviceErrorNoError;
+            }
+
+            QColor newColor = device->stateValue(colorStateTypeId).value<QColor>();
+            newColor.setAlpha(action.params().paramValue("brightness").toInt());
+            ColorAnimation *colorAnimation = new ColorAnimation(action.id(),
+                                                                device->paramValue("channel").toInt(),
+                                                                device->stateValue(colorStateTypeId).value<QColor>(),
+                                                                newColor,
+                                                                action.params().paramValue("animation duration").toInt());
+
+            connect(colorAnimation, &ColorAnimation::updateColor, this, &DevicePluginBoblight::updateColor);
+            connect(colorAnimation, &ColorAnimation::animationFinished, this, &DevicePluginBoblight::animationFinished);
+
+            m_runningAnimations.insert(colorAnimation, device);
+
+            colorAnimation->startAnimation();
+            return DeviceManager::DeviceErrorAsync;
         }
         return DeviceManager::DeviceErrorActionTypeNotFound;
     }

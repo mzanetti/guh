@@ -12,7 +12,7 @@ Rectangle {
     property bool buttonPressed: false
 
     Keys.onSpacePressed: {
-        longPressedTimer.start()
+        //longPressedTimer.start()
         controller.invokeAction(root.currentItem, "pressed")
         root.buttonPressed = true;
     }

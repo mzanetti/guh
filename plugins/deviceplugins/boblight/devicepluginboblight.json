@@ -66,6 +66,11 @@
                                     "type": "int",
                                     "minimumValue": "0",
                                     "maximumValue": "255"
+                                },
+                                {
+                                    "name": "animation duration",
+                                    "type": "uint",
+                                    "defaultValue": "1000"
                                 }
                             ]
                         }

@@ -21,9 +21,6 @@
 ColorAnimation::ColorAnimation(ActionId actionId, int channel, QColor startColor, QColor endColor, int duration) :
     m_actionId(actionId), m_channel(channel), m_startColor(startColor), m_endColor(endColor), m_duration(duration)
 {
-
-    //qDebug() << "Start animation" << m_startColor.toRgb() << " --> " << m_endColor.toRgb() << "duration" << duration;
-
     m_animationTimer = new QTimer(this);
     m_animationTimer->setInterval(30);
 
@@ -59,36 +56,40 @@ int ColorAnimation::channel()
 
 void ColorAnimation::animate()
 {
+    QColor newColor;
     int steps = m_duration / m_animationTimer->interval();
 
-    qDebug() << "Steps" << steps;
-
-    QColor newColor;
+    // RED
     int stepSize = (m_endColor.red() - m_startColor.red()) / steps;
     if (stepSize > 0) {
         newColor.setRed(qMin(m_currentColor.red() + stepSize, m_endColor.red()));
     } else {
         newColor.setRed(qMax(m_currentColor.red() + stepSize, m_endColor.red()));
     }
-    qDebug() << "Step size R" << stepSize;
 
-
+    // GREEN
     stepSize = (m_endColor.green() - m_startColor.green()) / steps;
     if (stepSize > 0) {
         newColor.setGreen(qMin(m_currentColor.green() + stepSize, m_endColor.green()));
     } else {
         newColor.setGreen(qMax(m_currentColor.green() + stepSize, m_endColor.green()));
     }
-    qDebug() << "Step size G" << stepSize;
 
+    // BLUE
     stepSize = (m_endColor.blue() - m_startColor.blue()) / steps;
     if (stepSize > 0) {
         newColor.setBlue(qMin(m_currentColor.blue() + stepSize, m_endColor.blue()));
     } else {
         newColor.setBlue(qMax(m_currentColor.blue() + stepSize, m_endColor.blue()));
     }
-    qDebug() << "Step size B" << stepSize;
 
+    // ALPHA
+    stepSize = (m_endColor.alpha() - m_startColor.alpha()) / steps;
+    if (stepSize > 0) {
+        newColor.setAlpha(qMin(m_currentColor.alpha() + stepSize, m_endColor.alpha()));
+    } else {
+        newColor.setAlpha(qMax(m_currentColor.alpha() + stepSize, m_endColor.alpha()));
+    }
 
     m_currentColor = newColor;
     emit updateColor(m_channel, newColor);
