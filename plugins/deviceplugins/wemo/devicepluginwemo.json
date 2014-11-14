@@ -70,8 +70,12 @@
                         {
                             "id": "269f25eb-d0b7-4144-b9ef-801f4ff3e90c",
                             "name": "set power",
-                            "type": "bool",
-                            "defaultValue": true
+                            "paramTypes": [
+                                {
+                                    "name": "power",
+                                    "type": "bool"
+                                }
+                            ]
                         }
                     ]
                 }

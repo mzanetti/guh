@@ -2,8 +2,8 @@ import QtQuick 1.1
 
 Rectangle {
     id: root
-    width: 480   //240x320  128x160
-    height: 640
+    width: 320   //240x320  128x160
+    height: 240
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()
@@ -61,7 +61,7 @@ Rectangle {
 
     Timer {
         id: splashTimer
-        interval: 2000
+        interval: 1500
         repeat: false
         running: true
     }
@@ -75,18 +75,18 @@ Rectangle {
 
     Image {
         id: splashImage
-        width: parent.width
-        height: parent.height
+        width: root.height
+        height: root.height
         anchors.centerIn: parent
-        source: "qrc:///images/logo.png"
+        source: "qrc:///images/splash.png"
         opacity: 0
     }
 
     Rectangle {
         id: rotator
-        width: root.width * 0.8
-        height: width
-        radius: width / 2
+        height: root.height
+        width: height
+        radius: height / 2
         anchors.centerIn: parent
         rotation: root.currentItem * -90
         Behavior on rotation {
@@ -95,7 +95,7 @@ Rectangle {
             }
         }
         color: "transparent"
-        border.width: 5
+        border.width: 0
         border.color: "white"
         opacity: 0
 
@@ -125,7 +125,7 @@ Rectangle {
 
                     /// Test rectangle stuff
                     color: index == 0 ? "blue" : index == 1 ? "red" : index == 2 ? "green" : "khaki"
-                    radius: width / 2
+                    radius: height / 2
 
                     Text {
                         anchors.centerIn: parent

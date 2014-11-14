@@ -30,6 +30,7 @@
 #include <QXmlStreamAttributes>
 
 #include "plugin/deviceplugin.h"
+#include "wemoeventhandler.h"
 
 class WemoSwitch : public QObject
 {
@@ -70,6 +71,8 @@ public:
     bool powerState();
     bool reachable();
 
+    void enableEventHandler();
+
 private:
     QUrl m_location;
     QHostAddress m_hostAddress;
@@ -81,6 +84,8 @@ private:
     QString m_manufacturer;
     QString m_serialNumber;
     QString m_uuid;
+
+    WemoEventHandler *m_eventHandler;
 
     QNetworkAccessManager *m_manager;
     QNetworkReply *m_refrashReplay;

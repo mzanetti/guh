@@ -7,13 +7,15 @@ QT+= network
 SOURCES += \
     devicepluginwemo.cpp \
     wemodiscovery.cpp \
-    wemoswitch.cpp
+    wemoswitch.cpp \
+    wemoeventhandler.cpp
 
 
 HEADERS += \
     devicepluginwemo.h \
     wemodiscovery.h \
-    wemoswitch.h
+    wemoswitch.h \
+    wemoeventhandler.h
 
 
 

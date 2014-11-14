@@ -60,9 +60,9 @@ ActionTypeId commandProgramListActionTypeId = ActionTypeId("9aa3a97e-505d-4906-9
 
 DevicePluginLgSmartTv::DevicePluginLgSmartTv()
 {
-    m_discovery = new TvDiscovery(this);
+    //m_discovery = new TvDiscovery(this);
 
-    connect(m_discovery,SIGNAL(discoveryDone(QList<TvDevice*>)),this,SLOT(discoveryDone(QList<TvDevice*>)));
+    //connect(m_discovery,SIGNAL(discoveryDone(QList<TvDevice*>)),this,SLOT(discoveryDone(QList<TvDevice*>)));
 }
 
 DeviceManager::DeviceError DevicePluginLgSmartTv::discoverDevices(const DeviceClassId &deviceClassId, const ParamList &params)

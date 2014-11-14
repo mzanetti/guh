@@ -142,6 +142,7 @@ ActionTypeId powerActionTypeId = ActionTypeId("269f25eb-d0b7-4144-b9ef-801f4ff3e
 DevicePluginWemo::DevicePluginWemo()
 {
     m_discovery = new WemoDiscovery(this);
+
     connect(m_discovery,SIGNAL(discoveryDone(QList<WemoSwitch*>)),this,SLOT(discoveryDone(QList<WemoSwitch*>)));
 }
 
@@ -152,7 +153,7 @@ DeviceManager::DeviceError DevicePluginWemo::discoverDevices(const DeviceClassId
         return DeviceManager::DeviceErrorDeviceClassNotFound;
     }
 
-    m_discovery->discover(2000);
+    m_discovery->discover(4000);
 
     return DeviceManager::DeviceErrorAsync;
 }
@@ -180,6 +181,7 @@ DeviceManager::DeviceSetupStatus DevicePluginWemo::setupDevice(Device *device)
         wemoSwitch->setLocation(QUrl(device->paramValue("location").toString()));
         wemoSwitch->setManufacturer(device->paramValue("manufacturer").toString());
         wemoSwitch->setDeviceType(device->paramValue("device type").toString());
+        wemoSwitch->enableEventHandler();
 
         connect(wemoSwitch,SIGNAL(stateChanged()),this,SLOT(wemoSwitchStateChanged()));
         connect(wemoSwitch,SIGNAL(setPowerFinished(bool,ActionId)),this,SLOT(setPowerFinished(bool,ActionId)));
@@ -201,14 +203,16 @@ DeviceManager::DeviceError DevicePluginWemo::executeAction(Device *device, const
     if(device->deviceClassId() == wemoSwitchDeviceClassId){
         if(action.actionTypeId() == powerActionTypeId){
             WemoSwitch *wemoSwitch = m_wemoSwitches.key(device);
-            wemoSwitch->setPower(action.param("power").value().toBool(),action.id());
+            if(wemoSwitch->powerState() == action.param("power").value().toBool()){
+                return DeviceManager::DeviceErrorNoError;
+            }
+
+            wemoSwitch->setPower(action.param("power").value().toBool(), action.id());
 
             return DeviceManager::DeviceErrorAsync;
-        }else{
-            return DeviceManager::DeviceErrorActionTypeNotFound;
         }
+        return DeviceManager::DeviceErrorActionTypeNotFound;
     }
-
     return DeviceManager::DeviceErrorDeviceClassNotFound;
 }
 

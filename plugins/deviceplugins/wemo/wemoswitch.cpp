@@ -136,6 +136,11 @@ bool WemoSwitch::reachable()
     return m_reachable;
 }
 
+void WemoSwitch::enableEventHandler()
+{
+    m_eventHandler = new WemoEventHandler(this, m_hostAddress,8080);
+}
+
 void WemoSwitch::replyFinished(QNetworkReply *reply)
 {
     if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200){
@@ -189,11 +194,6 @@ void WemoSwitch::refresh()
 void WemoSwitch::setPower(const bool &power, const ActionId &actionId)
 {
     m_actionId = actionId;
-
-    if(m_powerState == power){
-        emit setPowerFinished(true,actionId);
-        return;
-    }
 
     QByteArray setPowerMessage("<?xml version=\"1.0\" encoding=\"utf-8\"?><s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><u:SetBinaryState xmlns:u=\"urn:Belkin:service:basicevent:1\"><BinaryState>" + QByteArray::number((int)power) + "</BinaryState></u:SetBinaryState></s:Body></s:Envelope>");
 
