@@ -14,9 +14,9 @@ TuneUi::TuneUi(QObject *parent) :
     m_view->engine()->addImportPath(QLatin1String("modules"));
     m_view->engine()->rootContext()->setContextProperty("controller", this);
     m_view->setSource(QUrl(QLatin1String("qrc:///guhtune-ui/main.qml")));
-    m_view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    m_view->showFullScreen();
-
+//    m_view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+//    m_view->showFullScreen();
+    m_view->show();
 }
 
 TuneUi::~TuneUi()

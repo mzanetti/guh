@@ -3,7 +3,9 @@ import guhtune 1.0
 
 Rectangle {
     id: root
-    anchors.fill: parent
+    height: 240
+    width: 320
+    //anchors.fill: parent
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()
