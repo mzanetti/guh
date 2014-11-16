@@ -20,11 +20,13 @@
 #define DEVICEPLUGINELRO_H
 
 #include "plugin/deviceplugin.h"
-#include "guhbutton.h"
-#include "guhencoder.h"
 
 #include <QDebug>
 #include <QTimer>
+
+class GuhButton;
+class GuhEncoder;
+class TuneUi;
 
 class DevicePluginGuhTune : public DevicePlugin
 {
@@ -40,15 +42,18 @@ public:
     void startMonitoringAutoDevices() override;
     DeviceManager::DeviceSetupStatus setupDevice(Device *device) override;
 
-    Q_INVOKABLE void invokeAction(int actionIndex, const QString &what);
+    Q_INVOKABLE void pressed(int actionIndex);
+    Q_INVOKABLE void increase(int actionIndex);
+    Q_INVOKABLE void decrease(int actionIndex);
 
 private:
     GuhButton *m_button;
     GuhEncoder *m_encoder;
 
+    TuneUi *m_ui;
+
 private slots:
     void buttonPressed();
-    void buttonLongPressed();
     void buttonReleased();
 
     void encoderIncreased();

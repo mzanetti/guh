@@ -2,44 +2,50 @@ import QtQuick 1.1
 
 Rectangle {
     id: root
-    width: 320   //240x320  128x160
-    height: 240
+    anchors.fill: parent
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()
 
     property int currentItem: 0
     property bool buttonPressed: false
+    property bool selectionMode: false
+    property bool sleeping: false
 
-    Keys.onSpacePressed: {
-        //longPressedTimer.start()
-        controller.invokeAction(root.currentItem, "pressed")
-        root.buttonPressed = true;
-    }
-    Keys.onReleased: {
-        if (event.key == Qt.Key_Space) root.buttonPressed = false;
-        //controller.invokeAction(root.currentItem, "released");
-    }
-    Keys.onLeftPressed: {
-        if (buttonPressed) {
-            var newValue = root.currentItem - 1;
-            if (newValue < 0) {
-                newValue = 3
+    Connections {
+        target: controller
+        onButtonPressed: root.buttonPressed = true
+        onButtonReleased: { root.buttonPressed = false; root.selectionMode = false }
+        onSmallStep: {
+            if (!root.selectionMode) {
+                root.value = root.value + (TuneUi.RotateLeft ? -1 : 1);
             }
-            root.currentItem = newValue;
-        } else {
-            controller.invokeAction(root.currentItem, "decrease")
         }
     }
-    Keys.onRightPressed: {
-        if (buttonPressed) {
-            root.currentItem = (root.currentItem+1) % 4
-        } else {
-            controller.invokeAction(root.currentItem, "increase")
+
+    Timer {
+        running: root.buttonPressed
+        interval: 300
+        repeat: false
+        onTriggered: {
+            selectionMode = true;
         }
     }
-    Keys.onTabPressed: {
-        splashTimer.start()
+
+    Timer {
+        id: sleepTimer
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            root.sleeping = true
+        }
+    }
+
+    onButtonPressedChanged: {
+        if (!root.buttonPressed) {
+            controller.toggle(root.currentItem)
+            selectionMode = false;
+        }
     }
 
     states: [
@@ -50,6 +56,7 @@ Rectangle {
         State {
             name: "buttons"; when: !splashTimer.running
             PropertyChanges { target: rotator; opacity: 1 }
+            PropertyChanges { target: valueCircle; opacity: 1 }
         }
     ]
     transitions: [
@@ -73,18 +80,20 @@ Rectangle {
         running: false
     }
 
-    Image {
-        id: splashImage
-        width: root.height
-        height: root.height
+    property int maxSize: Math.min(root.height, root.width)
+    property int value: 50
+    ValueCircle {
+        id: valueCircle
+        height: maxSize
+        width: height
         anchors.centerIn: parent
-        source: "qrc:///images/splash.png"
+        value: root.value
         opacity: 0
     }
 
     Rectangle {
         id: rotator
-        height: root.height
+        height: maxSize - maxSize / 10
         width: height
         radius: height / 2
         anchors.centerIn: parent
@@ -94,7 +103,7 @@ Rectangle {
                 direction: RotationAnimation.Shortest
             }
         }
-        color: "transparent"
+        color: "black"
         border.width: 0
         border.color: "white"
         opacity: 0
@@ -139,15 +148,15 @@ Rectangle {
 
                 states: [
                     State {
-                        name: "shown"; when: index == root.currentItem && !root.buttonPressed
+                        name: "shown"; when: index == root.currentItem && !root.selectionMode
                         PropertyChanges { target: imageItem }
                     },
                     State {
-                        name: "hidden"; when: !root.buttonPressed && index != root.currentItem
+                        name: "hidden"; when: !root.selectionMode && index != root.currentItem
                         PropertyChanges { target: imageItem; opacity: 0 }
                     },
                     State {
-                        name: "rotating"; when: root.buttonPressed
+                        name: "rotating"; when: root.selectionMode
                         PropertyChanges { target: image; scale: 0.4; anchors.verticalCenterOffset: -distanceFromCenter }
                     }
                 ]
@@ -160,5 +169,18 @@ Rectangle {
                 ]
             }
         }
+    }
+
+    Image {
+        id: splashImage
+        width: root.height
+        height: root.height
+        anchors.centerIn: parent
+        source: "qrc:///images/splash.png"
+        opacity: 0
+    }
+
+    DebugUi {
+
     }
 }

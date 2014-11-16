@@ -10,36 +10,27 @@
                     "deviceClassId": "4a20b247-576c-4a0f-bc95-9eb6b2f2eb3d",
                     "name": "guhTune Item",
                     "createMethods": ["auto"],
-                    "paramTypes": [
-                        {
-                            "name": "item",
-                            "type": "int"
-                        }
-                    ],
-                    "stateTypes": [
-                        {
-                            "id": "191262bc-de9e-44e0-b88f-e5b9c25e10e0",
-                            "name": "selected",
-                            "type": "bool",
-                            "defaultValue": "false"
-                        }
-                    ],
                     "eventTypes": [
                         {
                             "id": "eeed2786-02eb-4a57-8e61-149741afb58c",
-                            "name": "clockwise tick"
+                            "name": "selected",
+                            "paramTypes": [
+                                {
+                                    "name": "index",
+                                    "type": "int"
+                                }
+                            ]
                         },
                         {
                             "id": "1bc20ff4-4a53-4346-9477-c2c15fc11d61",
-                            "name": "counterclockwise tick"
-                        },
-                        {
-                            "id": "e6fc4dce-3ce8-4651-a966-4c259e3c2a7a",
-                            "name": "pressed"
-                        },
-                        {
-                            "id": "9d26638d-f816-464a-adbc-38e8a2847914",
-                            "name": "released"
+                            "name": "setValue",
+                            "paramTypes": [
+                                {
+                                    "name": "index",
+                                    "type": "int"
+                                }
+
+                            ]
                         }
                     ]
                 }

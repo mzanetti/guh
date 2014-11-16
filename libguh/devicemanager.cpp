@@ -582,6 +582,12 @@ void DeviceManager::loadPlugins()
                 connect(pluginIface, &DevicePlugin::actionExecutionFinished, this, &DeviceManager::actionExecutionFinished);
                 connect(pluginIface, &DevicePlugin::pairingFinished, this, &DeviceManager::slotPairingFinished);
                 connect(pluginIface, &DevicePlugin::autoDevicesAppeared, this, &DeviceManager::autoDevicesAppeared);
+            } else {
+                if (!pluginIface) {
+                    qWarning() << "Error loading plugin" << loader.errorString();
+                } else {
+                    qWarning() << "Error loading plugin. Metadata verification failed";
+                }
             }
         }
     }
