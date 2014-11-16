@@ -86,6 +86,10 @@ public:
     int getValue();
 
     bool setEdgeInterrupt(int edge);
+    bool setActiveHigh(bool activeHigh);
+
+    int gpioPin();
+    int gpioDirection();
 
 private:
     int m_gpio;

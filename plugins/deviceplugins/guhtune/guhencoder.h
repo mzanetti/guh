@@ -20,40 +20,47 @@
 #define GUHENCODER_H
 
 #include <QObject>
-#include <QThread>
 #include <QDebug>
+#include <QTimer>
 
-#include "hardware/gpio.h"
+#include "hardware/gpiomonitor.h"
 
-class GuhEncoder : public QThread
+class GuhEncoder : public QObject
 {
     Q_OBJECT
 public:
-    explicit GuhEncoder(QObject *parent = 0, int gpioA = 2, int gpioB = 3);
+    explicit GuhEncoder(QObject *parent = 0, int gpioButton = 2, int gpioA = 3, int gpioB = 4);
+
     bool enable();
-    bool disable();
-    bool isAvailable();
+    void disable();
 
 private:
-    int m_gpioA;
-    int m_gpioB;
+    int m_gpioPinButton;
+    int m_gpioPinA;
+    int m_gpioPinB;
 
-    QMutex m_mutex;
-    QMutex m_isPressedMutex;
+    GpioMonitor *m_monitor;
 
-    bool m_enabled;
-    bool m_isPressed;
+    Gpio *m_gpioA;
+    Gpio *m_gpioB;
+    Gpio *m_gpioButton;
 
-    bool setUpGpio();
+    int m_stateA;
+    int m_stateB;
+    bool m_buttonPressed;
+    int m_encodedState;
 
-protected:
-    void run() override;
+    QTimer *m_longpressedTimer;
 
 signals:
-    void clockwiseTick();
-    void counterClockwiseTick();
-    void pressed();
-    void released();
+    void increased();
+    void decreased();
+    void buttonPressed();
+    void buttonReleased();
+    void buttonLongPressed();
+
+private slots:
+    void gpioChanged(const int &gpioPin, const int &value);
 };
 
 #endif // GUHENCODER_H

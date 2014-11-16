@@ -40,7 +40,6 @@ WemoDiscovery::WemoDiscovery(QObject *parent) :
 
     connect(this,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(error(QAbstractSocket::SocketError)));
     connect(this,SIGNAL(readyRead()),this,SLOT(readData()));
-    qDebug() << "-------> Wemo discovery successfuly created";
 }
 
 bool WemoDiscovery::checkXmlData(QByteArray data)

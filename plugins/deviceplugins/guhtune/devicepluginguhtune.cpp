@@ -48,26 +48,10 @@ void DevicePluginGuhTune::startMonitoringAutoDevices()
 
     // check if we have a display
     if (qgetenv("DISPLAY").isEmpty()) {
+        qDebug() << " ----> ERROR: no display found";
         return;
     }
-    qDebug() << " --> display found";
-
-    // Hardware pushbutton
-    m_button = new GuhButton(this, 30);
-    if(m_button->isAvailable()){
-        m_button->enable();
-        qDebug() << " --> hardware button found.";
-        connect(m_button, &GuhButton::pressed, this, &DevicePluginGuhTune::buttonPressed);
-        connect(m_button, &GuhButton::released, this, &DevicePluginGuhTune::buttonReleased);
-
-        // timer for long pressed detection
-        m_timer = new QTimer(this);
-        m_timer->setInterval(500);
-        m_timer->setSingleShot(true);
-        connect(m_timer, &QTimer::timeout, this, &DevicePluginGuhTune::buttonLongPressed);
-    } else {
-        qDebug() << " --> hardware button NOT found.";
-    }
+    qDebug() << " ----> display found";
 
     QList<DeviceDescriptor> deviceDescriptorList;
     for (int i = 0; i < 4; ++i) {
@@ -86,6 +70,33 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
 {
 
     if (myDevices().isEmpty()) {
+
+        // Hardware pushbutton
+        m_button = new GuhButton(this, 14);
+        if(m_button->enable()){
+            qDebug() << " ----> hardware button found.";
+            connect(m_button, &GuhButton::buttonPressed, this, &DevicePluginGuhTune::buttonPressed);
+            connect(m_button, &GuhButton::buttonReleased, this, &DevicePluginGuhTune::buttonReleased);
+            connect(m_button, &GuhButton::buttonLongPressed, this, &DevicePluginGuhTune::buttonLongPressed);
+        } else {
+            qDebug() << " ----> ERROR: hardware button NOT found.";
+            m_button->deleteLater();
+        }
+
+        // Hardware encoder
+        m_encoder = new GuhEncoder(this, 4, 2, 3);
+        if(m_encoder->enable()){
+            qDebug() << " ----> hardware encoder found.";
+            connect(m_encoder, &GuhEncoder::increased, this, &DevicePluginGuhTune::encoderIncreased);
+            connect(m_encoder, &GuhEncoder::decreased, this, &DevicePluginGuhTune::encoderDecreased);
+            connect(m_encoder, &GuhEncoder::buttonPressed, this, &DevicePluginGuhTune::buttonPressed);
+            connect(m_encoder, &GuhEncoder::buttonReleased, this, &DevicePluginGuhTune::buttonReleased);
+            connect(m_encoder, &GuhEncoder::buttonLongPressed, this, &DevicePluginGuhTune::buttonLongPressed);
+        } else {
+            qDebug() << " ----> ERROR: hardware button NOT found.";
+            m_encoder->deleteLater();
+        }
+
         // QML viewer
         QDeclarativeView *viewer = new QDeclarativeView();
         viewer->engine()->addImportPath(QLatin1String("modules"));
@@ -123,13 +134,11 @@ void DevicePluginGuhTune::invokeAction(int actionIndex, const QString &what)
             }
         }
     }
-    //qDebug() << "button pressed" << actionIndex << what;
 }
 
 void DevicePluginGuhTune::buttonPressed()
 {
     qDebug() << "button pressed";
-    m_timer->start();
 }
 
 void DevicePluginGuhTune::buttonLongPressed()
@@ -140,5 +149,14 @@ void DevicePluginGuhTune::buttonLongPressed()
 void DevicePluginGuhTune::buttonReleased()
 {
     qDebug() << "button released";
-    m_timer->stop();
+}
+
+void DevicePluginGuhTune::encoderIncreased()
+{
+    qDebug() << "encoder  +";
+}
+
+void DevicePluginGuhTune::encoderDecreased()
+{
+    qDebug() << "encoder  -";
 }

@@ -18,48 +18,83 @@
 
 #include "guhencoder.h"
 
-GuhEncoder::GuhEncoder(QObject *parent, int gpioA, int gpioB) :
-    QThread(parent), m_gpioA(gpioA), m_gpioB(gpioB)
+GuhEncoder::GuhEncoder(QObject *parent, int gpioButton, int gpioA, int gpioB) :
+    QObject(parent), m_gpioPinButton(gpioButton), m_gpioPinA(gpioA), m_gpioPinB(gpioB)
 {
-
 }
 
 bool GuhEncoder::enable()
 {
-    m_mutex.lock();
-    m_enabled = true;
-    m_mutex.unlock();
+    qDebug() << "setup encoder A = GPIO " << m_gpioPinA << ", B = GPIO " << m_gpioPinB << ", Button = GPIO " << m_gpioPinButton;
+    m_monitor = new GpioMonitor(this);
 
-    start();
+    m_gpioA = new Gpio(this, m_gpioPinA);
+    m_gpioB = new Gpio(this, m_gpioPinB);
+    m_gpioButton = new Gpio(this, m_gpioPinButton);
+
+    if(!m_monitor->addGpio(m_gpioA) || !m_monitor->addGpio(m_gpioB) || !m_monitor->addGpio(m_gpioButton)){
+        return false;
+    }
+    connect(m_monitor, &GpioMonitor::changed, this, &GuhEncoder::gpioChanged);
+
+    m_longpressedTimer = new QTimer(this);
+    m_longpressedTimer->setInterval(500);
+    m_longpressedTimer->setSingleShot(true);
+    connect(m_longpressedTimer, &QTimer::timeout, this, &GuhEncoder::buttonLongPressed);
+
+    m_monitor->start();
     return true;
 }
 
-bool GuhEncoder::disable()
+void GuhEncoder::disable()
 {
-    m_mutex.lock();
-    m_enabled = false;
-    m_mutex.unlock();
-    return true;
+    m_monitor->stop();
+    m_longpressedTimer->stop();
 }
 
-bool GuhEncoder::isAvailable()
+void GuhEncoder::gpioChanged(const int &gpioPin, const int &value)
 {
-    return setUpGpio();
+    if (gpioPin == m_gpioPinA) {
+        // encode rotation
+        if(value != m_stateA){
+            int encoded = (value << 1) | m_stateB;
+            int sum = (m_encodedState << 2) | encoded;
+            if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
+                emit increased();
+            }
+            if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
+                emit decreased();
+            }
+            m_encodedState = encoded;
+            m_stateA = value;
+        }
+    } else if (gpioPin == m_gpioPinB) {
+        // encode rotation
+        if(value != m_stateB){
+            int encoded = (m_stateA << 1) | value;
+            int sum = (m_encodedState << 2) | encoded;
+            if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
+                emit increased();
+            }
+            if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
+                emit decreased();
+            }
+            m_encodedState = encoded;
+            m_stateB = value;
+        }
+    } else if (gpioPin == m_gpioPinButton){
+        // check button state
+        bool buttonState = !QVariant(value).toBool();
+        if (m_buttonPressed != buttonState) {
+            if (buttonState) {
+                emit buttonPressed();
+                m_longpressedTimer->start();
+            } else {
+                emit buttonReleased();
+                m_longpressedTimer->stop();
+            }
+            m_buttonPressed = buttonState;
+        }
+    }
 }
 
-bool GuhEncoder::setUpGpio()
-{
-    qDebug() << "setup encoder GPIO";
-
-//    m_gpio = new Gpio(this, m_gpioPin);
-
-//    if (!m_gpio->exportGpio() || !m_gpio->setDirection(INPUT) || !m_gpio->setEdgeInterrupt(EDGE_BOTH)) {
-//        return false;
-//    }
-    return true;
-}
-
-void GuhEncoder::run()
-{
-
-}

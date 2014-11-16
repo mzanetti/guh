@@ -21,6 +21,7 @@
 
 #include "plugin/deviceplugin.h"
 #include "guhbutton.h"
+#include "guhencoder.h"
 
 #include <QDebug>
 #include <QTimer>
@@ -43,12 +44,15 @@ public:
 
 private:
     GuhButton *m_button;
-    QTimer *m_timer;
+    GuhEncoder *m_encoder;
 
 private slots:
     void buttonPressed();
     void buttonLongPressed();
     void buttonReleased();
+
+    void encoderIncreased();
+    void encoderDecreased();
 
 };
 
