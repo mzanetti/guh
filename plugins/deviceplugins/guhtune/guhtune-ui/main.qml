@@ -1,4 +1,5 @@
 import QtQuick 1.1
+import guhtune 1.0
 
 Rectangle {
     id: root
