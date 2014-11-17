@@ -20,7 +20,8 @@
 #include "devicemanager.h"
 #include "guhbutton.h"
 #include "guhencoder.h"
-#include "tuneui.h"
+#include "guhtouch.h"
+#include "guhtuneui.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -62,22 +63,28 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
     if (myDevices().isEmpty()) {
 
         // Hardware pushbutton
-        m_button = new GuhButton(this, 14);
+        m_button = new GuhButton(this, 4);
         if(m_button->enable()){
             qDebug() << " ----> hardware button found.";
             connect(m_button, &GuhButton::buttonPressed, this, &DevicePluginGuhTune::buttonPressed);
             connect(m_button, &GuhButton::buttonReleased, this, &DevicePluginGuhTune::buttonReleased);
+            connect(m_button, &GuhButton::buttonLongPressed, this, &DevicePluginGuhTune::buttonLongPressed);
         } else {
             qDebug() << " ----> ERROR: hardware button NOT found.";
             m_button->deleteLater();
         }
 
         // Hardware encoder
-        m_encoder = new GuhEncoder(this, 4, 2, 3);
+        m_encoder = new GuhEncoder(this, 14, 2, 3);
         if(m_encoder->enable()){
+
+            // TODO: set sensitivity
+
             qDebug() << " ----> hardware encoder found.";
             connect(m_encoder, &GuhEncoder::increased, this, &DevicePluginGuhTune::encoderIncreased);
             connect(m_encoder, &GuhEncoder::decreased, this, &DevicePluginGuhTune::encoderDecreased);
+            connect(m_encoder, &GuhEncoder::navigationLeft, this, &DevicePluginGuhTune::navigationLeft);
+            connect(m_encoder, &GuhEncoder::navigationRight, this, &DevicePluginGuhTune::navigationRight);
             connect(m_encoder, &GuhEncoder::buttonPressed, this, &DevicePluginGuhTune::buttonPressed);
             connect(m_encoder, &GuhEncoder::buttonReleased, this, &DevicePluginGuhTune::buttonReleased);
         } else {
@@ -85,7 +92,20 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
             m_encoder->deleteLater();
         }
 
-        m_ui = new TuneUi(this);
+        // Hardware touch sensor
+        m_touch = new GuhTouch(this, 17);
+        if(m_touch->enable()){
+            qDebug() << " ----> hardware touch sensor found.";
+            connect(m_touch, &GuhTouch::handDetected, this, &DevicePluginGuhTune::handDetected);
+            connect(m_touch, &GuhTouch::handDisappeared, this, &DevicePluginGuhTune::handDisappeared);
+        } else {
+            qDebug() << " ----> ERROR: hardware touch sensor NOT found.";
+            m_touch->deleteLater();
+        }
+
+        // UI
+        m_ui = new GuhTuneUi(this);
+
     }
 
     device->setName("guhTune item (" + device->paramValue("item").toString() + ")");
@@ -101,38 +121,60 @@ DeviceManager::HardwareResources DevicePluginGuhTune::requiredHardware() const
 
 void DevicePluginGuhTune::buttonPressed()
 {
-    m_ui->buttonPressed();
+    qDebug() << "button pressed";
 }
 
 void DevicePluginGuhTune::buttonReleased()
 {
-    m_ui->buttonReleased();
+    qDebug() << "button released";
+}
+
+void DevicePluginGuhTune::buttonLongPressed()
+{
+    qDebug() << "button long pressed";
+}
+
+void DevicePluginGuhTune::handDetected()
+{
+    qDebug() << "hand detected";
+}
+
+void DevicePluginGuhTune::handDisappeared()
+{
+    qDebug() << "hand disappeared";
 }
 
 void DevicePluginGuhTune::encoderIncreased()
 {
-    m_ui->smallStep(TuneUi::RotationRight);
+    qDebug() << "encoder +";
 }
 
 void DevicePluginGuhTune::encoderDecreased()
 {
-    m_ui->smallStep(TuneUi::RotationLeft);
+    qDebug() << "encoder -";
 }
-
-// TODO: bigStep
-
 
 void DevicePluginGuhTune::pressed(int actionIndex)
 {
-    qDebug() << actionIndex;
+    qDebug() << "pressed" << actionIndex;
 }
 
 void DevicePluginGuhTune::increase(int actionIndex)
 {
-    qDebug() << actionIndex;
+    qDebug() << "increase" << actionIndex;
 }
 
 void DevicePluginGuhTune::decrease(int actionIndex)
 {
-    qDebug() << actionIndex;
+    qDebug() << "decrease" << actionIndex;
+}
+
+void DevicePluginGuhTune::navigationLeft()
+{
+    qDebug() << "navigation LEFT     <--- ";
+}
+
+void DevicePluginGuhTune::navigationRight()
+{
+    qDebug() << "navigation Right    ---> ";
 }

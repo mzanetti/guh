@@ -26,7 +26,8 @@
 
 class GuhButton;
 class GuhEncoder;
-class TuneUi;
+class GuhTouch;
+class GuhTuneUi;
 
 class DevicePluginGuhTune : public DevicePlugin
 {
@@ -49,16 +50,20 @@ public:
 private:
     GuhButton *m_button;
     GuhEncoder *m_encoder;
+    GuhTouch *m_touch;
 
-    TuneUi *m_ui;
+    GuhTuneUi *m_ui;
 
 private slots:
     void buttonPressed();
     void buttonReleased();
-
+    void buttonLongPressed();
+    void handDetected();
+    void handDisappeared();
     void encoderIncreased();
     void encoderDecreased();
-
+    void navigationLeft();
+    void navigationRight();
 };
 
 #endif // DEVICEPLUGINELRO_H

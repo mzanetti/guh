@@ -61,6 +61,7 @@ void GpioMonitor::run()
     m_enabledMutex.lock();
     m_enabled = true;
     m_enabledMutex.unlock();
+
     while (enabled) {
         m_gpioListMutex.lock();
         ret = poll(fds, m_gpioList.size(), 2000);

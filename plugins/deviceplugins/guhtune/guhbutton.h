@@ -29,7 +29,7 @@ class GuhButton : public QObject
 {
     Q_OBJECT
 public:
-    explicit GuhButton(QObject *parent = 0, int gpio = 2);
+    explicit GuhButton(QObject *parent = 0, int gpio = 4);
     bool enable();
     void disable();
 

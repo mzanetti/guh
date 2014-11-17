@@ -55,12 +55,15 @@ private:
 signals:
     void increased();
     void decreased();
+    void navigationLeft();
+    void navigationRight();
     void buttonPressed();
     void buttonReleased();
     void buttonLongPressed();
 
 private slots:
     void gpioChanged(const int &gpioPin, const int &value);
+    void update();
 };
 
 #endif // GUHENCODER_H

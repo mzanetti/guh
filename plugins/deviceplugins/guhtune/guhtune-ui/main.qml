@@ -3,9 +3,9 @@ import guhtune 1.0
 
 Rectangle {
     id: root
-    height: 240
-    width: 320
-    //anchors.fill: parent
+    width: 640
+    height: 480
+    anchors.fill: parent
     color: "#000000"
 
     Component.onCompleted: root.forceActiveFocus()
@@ -179,7 +179,7 @@ Rectangle {
         width: root.height
         height: root.height
         anchors.centerIn: parent
-        source: "qrc:///images/splash.png"
+        source: "qrc:///images/logo.svg"
         opacity: 0
     }
 

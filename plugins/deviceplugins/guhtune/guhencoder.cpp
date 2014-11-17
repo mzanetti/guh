@@ -98,3 +98,8 @@ void GuhEncoder::gpioChanged(const int &gpioPin, const int &value)
     }
 }
 
+void GuhEncoder::update()
+{
+
+}
+

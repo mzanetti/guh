@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/logo.png</file>
-        <file>images/splash.png</file>
-        <file>images/couch.png</file>
-        <file>images/work.png</file>
-        <file>images/gumba.png</file>
+        <file>images/couch.svg</file>
+        <file>images/light.svg</file>
+        <file>images/logo.svg</file>
+        <file>images/template.svg</file>
+        <file>images/work.svg</file>
     </qresource>
 </RCC>

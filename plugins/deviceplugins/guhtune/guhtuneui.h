@@ -1,11 +1,11 @@
-#ifndef TUNEUI_H
-#define TUNEUI_H
+#ifndef GUHTUNEUI_H
+#define GUHTUNEUI_H
 
 #include <QObject>
 
 class QDeclarativeView;
 
-class TuneUi : public QObject
+class GuhTuneUi : public QObject
 {
     Q_OBJECT
     Q_ENUMS(TuneUi)
@@ -16,8 +16,8 @@ public:
         RotationRight
     };
 
-    explicit TuneUi(QObject *parent = 0);
-    ~TuneUi();
+    explicit GuhTuneUi(QObject *parent = 0);
+    ~GuhTuneUi();
 
 signals:
     // Called from ui
@@ -34,4 +34,4 @@ private:
     QDeclarativeView *m_view;
 };
 
-#endif // TUNEUI_H
+#endif // GUHTUNEUI_H
