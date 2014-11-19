@@ -122,11 +122,13 @@ DeviceManager::HardwareResources DevicePluginGuhTune::requiredHardware() const
 void DevicePluginGuhTune::buttonPressed()
 {
     qDebug() << "button pressed";
+    m_ui->buttonPressed();
 }
 
 void DevicePluginGuhTune::buttonReleased()
 {
     qDebug() << "button released";
+    m_ui->buttonReleased();
 }
 
 void DevicePluginGuhTune::buttonLongPressed()
@@ -137,6 +139,7 @@ void DevicePluginGuhTune::buttonLongPressed()
 void DevicePluginGuhTune::handDetected()
 {
     qDebug() << "hand detected";
+    m_ui->wakeup();
 }
 
 void DevicePluginGuhTune::handDisappeared()
@@ -147,11 +150,13 @@ void DevicePluginGuhTune::handDisappeared()
 void DevicePluginGuhTune::encoderIncreased()
 {
     qDebug() << "encoder +";
+    m_ui->smallStep(GuhTuneUi::RotationLeft);
 }
 
 void DevicePluginGuhTune::encoderDecreased()
 {
     qDebug() << "encoder -";
+    m_ui->smallStep(GuhTuneUi::RotationRight);
 }
 
 void DevicePluginGuhTune::pressed(int actionIndex)

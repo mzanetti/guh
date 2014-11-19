@@ -29,6 +29,7 @@ signals:
     void buttonReleased();
     void smallStep(Rotation rotation);
     void bigStep(Rotation rotation);
+    void wakeup();
 
 private:
     QDeclarativeView *m_view;

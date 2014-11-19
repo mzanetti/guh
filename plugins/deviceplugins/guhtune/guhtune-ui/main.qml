@@ -38,6 +38,10 @@ Rectangle {
                 }
             }
         }
+        onWakeup: {
+            root.sleeping = false;
+            sleepTimer.restart();
+        }
     }
 
     Timer {
