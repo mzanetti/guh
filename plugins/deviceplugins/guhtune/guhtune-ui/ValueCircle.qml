@@ -1,11 +1,17 @@
 import QtQuick 2.1
 
-Rectangle {
+Item {
     id: root
-    color: "blue"
-    radius: width / 2
 
     property int value: 0
+    property alias circleOpacity: outerCircle.opacity
+
+    Rectangle {
+        id: outerCircle
+        anchors.fill: parent
+        color: "blue"
+        radius: width / 2
+    }
 
     QtObject {
         id: priv
