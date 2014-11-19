@@ -113,9 +113,9 @@ DeviceManager::DeviceManager(QObject *parent) :
     // Make sure this is always emitted after plugins and devices are loaded
     QMetaObject::invokeMethod(this, "loaded", Qt::QueuedConnection);
 
-    m_radio433 = new Radio433(this);
-    connect(m_radio433, &Radio433::dataReceived, this, &DeviceManager::radio433SignalReceived);
-    m_radio433->enable();
+//    m_radio433 = new Radio433(this);
+//    connect(m_radio433, &Radio433::dataReceived, this, &DeviceManager::radio433SignalReceived);
+//    m_radio433->enable();
     // TODO: error handling if no Radio433 detected (GPIO or network), disable radio433 plugins or something...
 }
 

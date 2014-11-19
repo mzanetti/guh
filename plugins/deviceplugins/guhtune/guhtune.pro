@@ -2,7 +2,7 @@ include(../../plugins.pri)
 
 TARGET = $$qtLibraryTarget(guh_devicepluginguhtune)
 
-QT += declarative quick
+QT += quick qml
 
 SOURCES +=                  \
     devicepluginguhtune.cpp \

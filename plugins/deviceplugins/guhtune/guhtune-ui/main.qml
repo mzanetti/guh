@@ -1,10 +1,10 @@
-import QtQuick 1.1
+import QtQuick 2.1
 import guhtune 1.0
 
 Rectangle {
     id: root
-    width: 640
-    height: 480
+//    width: 1920
+//    height: 1080
     anchors.fill: parent
     color: "#000000"
 
