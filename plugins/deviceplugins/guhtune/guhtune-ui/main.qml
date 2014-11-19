@@ -285,7 +285,7 @@ Rectangle {
             repeat: true
             onTriggered: {
                 var now = new Date()
-                clock.text = now.getHours() + ":" + now.getMinutes()
+                clock.text = Qt.formatTime(now, "hh:mm")
             }
         }
         anchors.centerIn: parent
