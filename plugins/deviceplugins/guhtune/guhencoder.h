@@ -34,6 +34,10 @@ public:
     bool enable();
     void disable();
 
+    void setBasicSensitivity(int sensitivity);
+    void setNavigationSensitivity(int sensitivity);
+
+
 private:
     int m_gpioPinButton;
     int m_gpioPinA;
@@ -51,6 +55,14 @@ private:
     int m_encodedState;
 
     QTimer *m_longpressedTimer;
+
+    int m_basicSensitivity;
+    int m_basicSensitivityState;
+    int m_basicSensitivityLastState;
+
+    int m_navigationSensitivity;
+    int m_navigationSensitivityState;
+    int m_navigationSensitivityLastState;
 
 signals:
     void increased();

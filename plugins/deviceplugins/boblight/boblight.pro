@@ -3,7 +3,7 @@ include(../../plugins.pri)
 TARGET = $$qtLibraryTarget(guh_devicepluginboblight)
 
 INCLUDEPATH += /usr/local/include/
-LIBS += -L/opt/raspberry-pi/rootfs/usr/local/lib/ -lboblight
+LIBS += -L/opt/beaglebone-black/rootfs/usr/local/lib/ -lboblight
 
 SOURCES += \
     devicepluginboblight.cpp \

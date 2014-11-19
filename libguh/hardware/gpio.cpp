@@ -84,7 +84,7 @@ bool Gpio::unexportGpio()
 
     ssize_t len = snprintf(buf, sizeof(buf), "%d", m_gpio);
     if(write(fd, buf, len) != len){
-        qDebug() << "ERROR: could not write to gpio (unexport)";
+        //qDebug() << "ERROR: could not write to gpio (unexport)";
         close(fd);
         return false;
     }
@@ -312,7 +312,7 @@ bool Gpio::setEdgeInterrupt(int edge)
     return false;
 }
 
-bool Gpio::setActiveHigh(bool activeHigh)
+bool Gpio::setActiveLow(bool activeLow)
 {
     char buf[64];
     snprintf(buf, sizeof(buf), "/sys/class/gpio/gpio%d/active_low", m_gpio);
@@ -322,7 +322,7 @@ bool Gpio::setActiveHigh(bool activeHigh)
         return false;
     }
 
-    if(!activeHigh){
+    if(!activeLow){
         if(write(fd, "0", 2) != 2){
             qDebug() << "ERROR: could not write to gpio (set Active LOW)";
             close(fd);
@@ -331,7 +331,7 @@ bool Gpio::setActiveHigh(bool activeHigh)
         close(fd);
         return true;
     }
-    if(activeHigh){
+    if(activeLow){
         if(write(fd, "1", 2) != 2){
             qDebug() << "ERROR: could not write to gpio (set Active HIGH)";
             close(fd);

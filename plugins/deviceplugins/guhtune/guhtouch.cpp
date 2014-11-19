@@ -30,7 +30,7 @@ void GuhTouch::gpioChanged(const int &gpioPin, const int &value)
 {
     if (gpioPin == m_gpioPin){
         // check touch state
-        bool touchState = QVariant(value).toBool();
+        bool touchState = !QVariant(value).toBool();
         if (m_touchState != touchState) {
             if (touchState) {
                 emit handDetected();

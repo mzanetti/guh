@@ -21,6 +21,8 @@
 GuhEncoder::GuhEncoder(QObject *parent, int gpioButton, int gpioA, int gpioB) :
     QObject(parent), m_gpioPinButton(gpioButton), m_gpioPinA(gpioA), m_gpioPinB(gpioB)
 {
+    m_basicSensitivityState = 0;
+    m_navigationSensitivityState = 0;
 }
 
 bool GuhEncoder::enable()
@@ -52,35 +54,57 @@ void GuhEncoder::disable()
     m_longpressedTimer->stop();
 }
 
+void GuhEncoder::setBasicSensitivity(int sensitivity)
+{
+    m_basicSensitivity = sensitivity;
+}
+
+void GuhEncoder::setNavigationSensitivity(int sensitivity)
+{
+    m_navigationSensitivity = sensitivity;
+}
+
 void GuhEncoder::gpioChanged(const int &gpioPin, const int &value)
 {
     if (gpioPin == m_gpioPinA) {
         // encode rotation
-        if(value != m_stateA){
+        if(!value != m_stateA){
             int encoded = (value << 1) | m_stateB;
             int sum = (m_encodedState << 2) | encoded;
             if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
+                //                m_basicSensitivityState++;
+                //                m_navigationSensitivityState++;
+                //                update();
                 emit increased();
             }
             if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
+                //                m_basicSensitivityState--;
+                //                m_navigationSensitivityState--;
+                //                update();
                 emit decreased();
             }
             m_encodedState = encoded;
-            m_stateA = value;
+            m_stateA = !value;
         }
     } else if (gpioPin == m_gpioPinB) {
         // encode rotation
-        if(value != m_stateB){
+        if(!value != m_stateB){
             int encoded = (m_stateA << 1) | value;
             int sum = (m_encodedState << 2) | encoded;
             if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
+                //                m_basicSensitivityState++;
+                //                m_navigationSensitivityState++;
+                //                update();
                 emit increased();
             }
             if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
+                //                m_basicSensitivityState--;
+                //                m_navigationSensitivityState--;
+                //                update();
                 emit decreased();
             }
             m_encodedState = encoded;
-            m_stateB = value;
+            m_stateB = !value;
         }
     } else if (gpioPin == m_gpioPinButton){
         // check button state
@@ -100,6 +124,30 @@ void GuhEncoder::gpioChanged(const int &gpioPin, const int &value)
 
 void GuhEncoder::update()
 {
+    qDebug() << m_basicSensitivityState << m_navigationSensitivityState;
 
+    // negativ
+    //  größer als das vorherige
+    //  current != 0
+    //
+
+    if (m_basicSensitivityState % m_basicSensitivity == 0 && m_basicSensitivityState != 0) {
+        // check direction
+        if (m_basicSensitivityState < 0) {
+            emit decreased();
+        } else {
+            emit increased();
+        }
+        m_basicSensitivityState = 0;
+    }
+    if (m_navigationSensitivityState % m_navigationSensitivity == 0 && m_navigationSensitivityState != 0) {
+        // check direction
+        if (m_navigationSensitivityState < 0) {
+            emit navigationLeft();
+        } else {
+            emit navigationRight();
+        }
+        m_navigationSensitivityState= 0;
+    }
 }
 

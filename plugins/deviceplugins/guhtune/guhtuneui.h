@@ -3,12 +3,12 @@
 
 #include <QObject>
 
-class QDeclarativeView;
+class QQuickView;
 
 class GuhTuneUi : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(TuneUi)
+    Q_ENUMS(GuhTuneUi)
 
 public:
     enum Rotation {
@@ -32,7 +32,7 @@ signals:
     void wakeup();
 
 private:
-    QDeclarativeView *m_view;
+    QQuickView *m_view;
 };
 
 #endif // GUHTUNEUI_H

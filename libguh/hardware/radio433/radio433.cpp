@@ -29,8 +29,8 @@
 Radio433::Radio433(QObject *parent) :
     QObject(parent)
 {
-    m_receiver = new Radio433Receiver(this,27);
-    m_transmitter = new Radio433Trasmitter(this,22);
+    m_receiver = new Radio433Receiver(this,30);
+    m_transmitter = new Radio433Trasmitter(this,31);
     m_brennenstuhlTransmitter = new Radio433BrennenstuhlGateway(this);
 
     connect(m_receiver, &Radio433Receiver::readingChanged, this, &Radio433::readingChanged);

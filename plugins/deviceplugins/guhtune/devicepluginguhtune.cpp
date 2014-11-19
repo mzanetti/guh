@@ -47,7 +47,7 @@ void DevicePluginGuhTune::startMonitoringAutoDevices()
     // check if we have a display
     if (qgetenv("DISPLAY").isEmpty()) {
         qDebug() << " ----> ERROR: no display found";
-        return;
+        //return;
     }
     qDebug() << " ----> display found";
 
@@ -63,7 +63,7 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
     if (myDevices().isEmpty()) {
 
         // Hardware pushbutton
-        m_button = new GuhButton(this, 4);
+        m_button = new GuhButton(this, 44);
         if(m_button->enable()){
             qDebug() << " ----> hardware button found.";
             connect(m_button, &GuhButton::buttonPressed, this, &DevicePluginGuhTune::buttonPressed);
@@ -75,12 +75,13 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
         }
 
         // Hardware encoder
-        m_encoder = new GuhEncoder(this, 14, 2, 3);
+        m_encoder = new GuhEncoder(this, 47, 46, 65);
         if(m_encoder->enable()){
-
-            // TODO: set sensitivity
-
             qDebug() << " ----> hardware encoder found.";
+
+            m_encoder->setBasicSensitivity(2);
+            m_encoder->setNavigationSensitivity(10);
+
             connect(m_encoder, &GuhEncoder::increased, this, &DevicePluginGuhTune::encoderIncreased);
             connect(m_encoder, &GuhEncoder::decreased, this, &DevicePluginGuhTune::encoderDecreased);
             connect(m_encoder, &GuhEncoder::navigationLeft, this, &DevicePluginGuhTune::navigationLeft);
@@ -93,7 +94,7 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
         }
 
         // Hardware touch sensor
-        m_touch = new GuhTouch(this, 17);
+        m_touch = new GuhTouch(this, 26);
         if(m_touch->enable()){
             qDebug() << " ----> hardware touch sensor found.";
             connect(m_touch, &GuhTouch::handDetected, this, &DevicePluginGuhTune::handDetected);
@@ -104,8 +105,11 @@ DeviceManager::DeviceSetupStatus DevicePluginGuhTune::setupDevice(Device *device
         }
 
         // UI
-        m_ui = new GuhTuneUi(this);
-
+        if (qgetenv("DISPLAY").isEmpty()) {
+            qDebug() << " ----> ERROR: display NOT found.";
+        } else {
+            m_ui = new GuhTuneUi(this);
+        }
     }
 
     device->setName("guhTune item (" + device->paramValue("item").toString() + ")");
