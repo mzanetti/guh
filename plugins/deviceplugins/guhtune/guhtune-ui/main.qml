@@ -21,8 +21,9 @@ Rectangle {
         onButtonReleased: { root.buttonPressed = false; root.selectionMode = false }
         onSmallStep: {
             if (!root.selectionMode) {
-                root.value = Math.min(100, Math.max(0, root.value + (TuneUi.RotateLeft ? -1 : 1)));
-                controller.setValue(root.value)
+                var currentItem = repeater.itemAt(root.currentItem);
+                currentItem.value = Math.min(100, Math.max(0, currentItem.value + (TuneUi.RotateLeft ? -1 : 1)));
+                controller.setValue(root.currentItem, currentItem.value)
             }
         }
         onBigStep: {
@@ -68,10 +69,6 @@ Rectangle {
             controller.toggle(root.currentItem)
             selectionMode = false;
         }
-        root.sleeping = false;
-        sleepTimer.restart();
-    }
-    onValueChanged: {
         root.sleeping = false;
         sleepTimer.restart();
     }
@@ -124,14 +121,14 @@ Rectangle {
     }
 
     property int maxSize: Math.min(root.height, root.width)
-    property int value: 50
     ValueCircle {
         id: valueCircle
         height: maxSize
         width: height
         anchors.centerIn: parent
-        value: root.value
+        value: repeater.count > 0 ? repeater.itemAt(root.currentItem).value : 0
         circleOpacity: 0
+        visible: root.currentItem == 0
         Behavior on circleOpacity {
             NumberAnimation {}
         }
@@ -171,6 +168,13 @@ Rectangle {
                 rotation: index * 90
                 z: index == root.currentItem ? 1 : 0
 
+                property int value: 50
+                onValueChanged: {
+                    print("value changed", value)
+                    root.sleeping = false;
+                    sleepTimer.restart();
+                }
+
                 // This should be the image
                 Image {
                     id: image
@@ -200,6 +204,44 @@ Rectangle {
                     }
                     Behavior on opacity {
                         NumberAnimation {}
+                    }
+
+                    Item {
+                        anchors.fill: parent
+                        visible: index == 3
+
+                        TempIndicator {
+                            id: currentTempBar
+                            anchors.centerIn: parent
+                            anchors.horizontalCenterOffset: -width * 1.5
+                            height: parent.height / 3
+                            width: height / 4
+                            percentage: desiredTempBar.percentage
+                            Behavior on percentage {
+                                NumberAnimation { duration: 1000 * 60 * 5 }
+                            }
+                        }
+
+                        Text {
+                            anchors { top: currentTempBar.bottom; horizontalCenter: currentTempBar.horizontalCenter; topMargin: height / 2 }
+                            text: currentTempBar.currentTemp + "°"
+                            font.pixelSize: parent.height / 15
+                        }
+
+                        TempIndicator {
+                            id: desiredTempBar
+                            anchors.centerIn: parent
+                            anchors.horizontalCenterOffset: width * 1.5
+                            height: parent.height / 3
+                            width: height / 4
+                            percentage: imageItem.value
+                        }
+                        Text {
+                            anchors { top: desiredTempBar.bottom; horizontalCenter: desiredTempBar.horizontalCenter; topMargin: height / 2 }
+                            // 0 : (max - min) = perc : 100
+                            text: desiredTempBar.currentTemp + "°"
+                            font.pixelSize: parent.height / 15
+                        }
                     }
                 }
 

@@ -9,7 +9,7 @@ Item {
     Rectangle {
         id: outerCircle
         anchors.fill: parent
-        color: "blue"
+        color: "#9fc84a"
         radius: width / 2
     }
 

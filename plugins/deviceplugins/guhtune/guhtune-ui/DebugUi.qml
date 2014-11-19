@@ -34,7 +34,7 @@ Column {
                 if (root.selectionMode) {
                     root.currentItem = (root.currentItem + 1) % 4;
                 } else {
-                    root.value++;
+                    repeater.itemAt(root.currentItem).value++;
                 }
             }
         }
@@ -51,8 +51,18 @@ Column {
                         root.currentItem--;
                     }
                 } else {
-                    root.value--;
+                    repeater.itemAt(root.currentItem).value--;
                 }
+            }
+        }
+    }
+    Rectangle { width: parent.width; height: width / 4; color: "white"
+        Text{ anchors.centerIn: parent; text: "wakeup" }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                root.sleeping = false;
+                sleepTimer.restart();
             }
         }
     }
