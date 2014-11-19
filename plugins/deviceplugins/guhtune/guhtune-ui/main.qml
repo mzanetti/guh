@@ -245,6 +245,7 @@ Rectangle {
         anchors.centerIn: parent
         color: "white"
         opacity: 0
+        font.pixelSize: root.height / 10
     }
 
     Image {
