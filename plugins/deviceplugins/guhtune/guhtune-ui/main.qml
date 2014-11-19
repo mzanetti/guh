@@ -21,7 +21,21 @@ Rectangle {
         onButtonReleased: { root.buttonPressed = false; root.selectionMode = false }
         onSmallStep: {
             if (!root.selectionMode) {
-                root.value = root.value + (TuneUi.RotateLeft ? -1 : 1);
+                root.value = Math.min(100, Math.max(0, root.value + (TuneUi.RotateLeft ? -1 : 1)));
+                controller.setValue(root.value)
+            }
+        }
+        onBigStep: {
+            if (root.selectionMode) {
+                if (TuneUi.RotateLeft) {
+                    root.currentItem = (root.currentItem + 1) % 4;
+                } else {
+                    if (root.currentItem == 0) {
+                        root.currentItem = 3;
+                    } else {
+                        root.currentItem--;
+                    }
+                }
             }
         }
     }
@@ -38,7 +52,8 @@ Rectangle {
     Timer {
         id: sleepTimer
         interval: 5000
-        repeat: false
+        repeat: repeat
+        running: !root.selectionMode
         onTriggered: {
             root.sleeping = true
         }
@@ -49,23 +64,44 @@ Rectangle {
             controller.toggle(root.currentItem)
             selectionMode = false;
         }
+        root.sleeping = false;
+        sleepTimer.restart();
+    }
+    onValueChanged: {
+        root.sleeping = false;
+        sleepTimer.restart();
     }
 
     states: [
         State {
-            name: "splash"; when: splashTimer.running
+            name: "splash"; when: splashTimer.running && !root.sleeping
             PropertyChanges { target: splashImage; opacity: 1 }
         },
         State {
-            name: "buttons"; when: !splashTimer.running
+            name: "buttons"; when: !splashTimer.running && !root.sleeping
             PropertyChanges { target: rotator; opacity: 1 }
-            PropertyChanges { target: valueCircle; opacity: 1 }
+            PropertyChanges { target: valueCircle; circleOpacity: root.selectionMode ? 0 : 1 }
+        },
+        State {
+            name: "clock"; when: root.sleeping
+            PropertyChanges { target: clock; opacity: 1 }
         }
+
     ]
     transitions: [
         Transition {
+            from: "clock"
+            to: "buttons"
+            PropertyAnimation { target: splashImage; property: "opacity"; duration: 200 }
+            PropertyAnimation { target: rotator; property: "opacity"; duration: 200 }
+            PropertyAnimation { target: clock; property: "opacity"; duration: 200 }
+            PropertyAnimation { target: valueCircle; property: "circleOpacity"; duration: 200 }
+        },
+        Transition {
             PropertyAnimation { target: splashImage; property: "opacity"; duration: splashTimer.interval }
             PropertyAnimation { target: rotator; property: "opacity"; duration: splashTimer.interval }
+            PropertyAnimation { target: clock; property: "opacity"; duration: splashTimer.interval }
+            PropertyAnimation { target: valueCircle; property: "circleOpacity"; duration: splashTimer.interval }
         }
     ]
 
@@ -91,7 +127,17 @@ Rectangle {
         width: height
         anchors.centerIn: parent
         value: root.value
-        opacity: 0
+        circleOpacity: 0
+        Behavior on circleOpacity {
+            NumberAnimation {}
+        }
+    }
+    Rectangle {
+        anchors.centerIn: parent
+        height: maxSize - maxSize / 10
+        width: height
+        color: "black"
+        radius: height / 2
     }
 
     Rectangle {
@@ -122,30 +168,36 @@ Rectangle {
                 z: index == root.currentItem ? 1 : 0
 
                 // This should be the image
-                Rectangle {
+                Image {
                     id: image
                     anchors.centerIn: parent
                     height: parent.height
                     width: parent.width
+                    source: {
+                        switch(index) {
+                        case 0:
+                            return "qrc:///images/light.svg";
+                        case 1:
+                            return "qrc:///images/couch.svg";
+                        case 2:
+                            return "qrc:///images/work.svg";
+                        case 3:
+                            return "qrc:///images/template.svg";
+                        }
+                    }
                     rotation: index * -90 + root.currentItem * 90
                     Behavior on rotation {
                         RotationAnimation {
                             direction: RotationAnimation.Shortest
                         }
                     }
-
-
-                    /// Test rectangle stuff
-                    color: index == 0 ? "blue" : index == 1 ? "red" : index == 2 ? "green" : "khaki"
-                    radius: height / 2
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: index
-                        scale: 1 / parent.scale
+                    Behavior on scale {
+                        NumberAnimation {}
+                    }
+                    Behavior on opacity {
+                        NumberAnimation {}
                     }
                 }
-
 
                 property int distanceFromCenter: height / 3.5
 
@@ -160,7 +212,12 @@ Rectangle {
                     },
                     State {
                         name: "rotating"; when: root.selectionMode
-                        PropertyChanges { target: image; scale: 0.4; anchors.verticalCenterOffset: -distanceFromCenter }
+                        PropertyChanges {
+                            target: image;
+                            scale: index == root.currentItem ? 0.4 : 0.3;
+                            anchors.verticalCenterOffset: -distanceFromCenter
+                            opacity: index == root.currentItem ? 1 : 0.8
+                        }
                     }
                 ]
 
@@ -172,6 +229,22 @@ Rectangle {
                 ]
             }
         }
+    }
+
+    Text {
+        id: clock
+        Timer {
+            interval: 1000
+            running: true
+            repeat: true
+            onTriggered: {
+                var now = new Date()
+                clock.text = now.getHours() + ":" + now.getMinutes()
+            }
+        }
+        anchors.centerIn: parent
+        color: "white"
+        opacity: 0
     }
 
     Image {

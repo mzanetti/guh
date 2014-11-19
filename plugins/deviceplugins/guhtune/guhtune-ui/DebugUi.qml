@@ -32,7 +32,7 @@ Column {
             anchors.fill: parent
             onClicked: {
                 if (root.selectionMode) {
-                    root.currentItem++;
+                    root.currentItem = (root.currentItem + 1) % 4;
                 } else {
                     root.value++;
                 }
@@ -45,7 +45,11 @@ Column {
             anchors.fill: parent
             onClicked: {
                 if (root.selectionMode) {
-                    root.currentItem--;
+                    if (root.currentItem == 0) {
+                        root.currentItem = 3;
+                    } else {
+                        root.currentItem--;
+                    }
                 } else {
                     root.value--;
                 }
