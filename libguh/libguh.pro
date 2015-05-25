@@ -5,7 +5,13 @@ TEMPLATE = lib
 
 QT += network
 
-target.path = /usr/lib
+!ubuntu {
+    target.path = /usr/lib
+}
+ubuntu {
+    load(ubuntu-click)
+    target.path = $${UBUNTU_CLICK_BINARY_PATH}
+}
 INSTALLS += target
 
 SOURCES += plugin/device.cpp \

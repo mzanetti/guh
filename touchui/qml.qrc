@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/gup.qml</file>
+    </qresource>
+</RCC>

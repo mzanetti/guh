@@ -5,12 +5,18 @@ TEMPLATE = app
 
 INCLUDEPATH += ../libguh jsonrpc
 
-target.path = /usr/bin
+!ubuntu {
+    target.path = /usr/bin
+}
+ubuntu {
+    load(ubuntu-click)
+    target.path = $${UBUNTU_CLICK_BINARY_PATH}
+}
 INSTALLS += target
 
 QT += network sql
-
 LIBS += -L$$top_builddir/libguh/ -lguh
+
 
 include(server.pri)
 include(qtservice/qtservice.pri)

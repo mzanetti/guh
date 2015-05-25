@@ -17,5 +17,12 @@ infofile.input = JSONFILES
 
 QMAKE_EXTRA_COMPILERS += infofile
 
-target.path = /usr/lib/guh/plugins/
+!ubuntu {
+    target.path = /usr/lib/guh/plugins/
+}
+ubuntu {
+    load(ubuntu-click)
+    target.path = $${UBUNTU_CLICK_BINARY_PATH}/../lib/guh/plugins/
+}
+
 INSTALLS += target

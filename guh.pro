@@ -8,6 +8,10 @@ SUBDIRS += libguh server plugins
     SUBDIRS += tests
 }
 
+ubuntu {
+    SUBDIRS += touchui/app.pro
+}
+
 server.depends = libguh plugins
 plugins.depends = libguh
 tests.depends = libguh

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=gup
+Comment=Gear Up your Phone
+Exec=gup
+Terminal=false
+Icon=gup.svg
+X-Ubuntu-Touch=true

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=guhd
+Exec=guhd
+Icon=notused.png
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
+
